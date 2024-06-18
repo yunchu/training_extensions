@@ -1,7 +1,7 @@
 #!/bin/bash
 
 GPU_ID="all"
-VER_CUDA="11.7.1"
+VER_CUDA="12.1.0"
 TAG_RUNNER="latest"
 ADDITIONAL_LABELS=""
 MOUNT_PATH=""
@@ -15,11 +15,6 @@ while [[ $# -gt 0 ]]; do
   case $key in
     -g|--gpu-ids)
       GPU_ID="$2"
-      shift # past argument
-      shift # past value
-      ;;
-    -c|--cuda)
-      VER_CUDA="$2"
       shift # past argument
       shift # past value
       ;;
@@ -79,7 +74,6 @@ cat << EndofMessage
         <github-token>      Github token string
     Options
         -g|--gpu-ids        GPU ID or IDs (comma separated) for runner or 'all'
-        -c|--cuda           Specify CUDA version
         -t|--tag            Specify TAG for the CI container
         -l|--labels         Additional label string to set the actions-runner
         -m|--mount          Dataset root path to be mounted to the started container (absolute path)
@@ -149,9 +143,9 @@ if [ "$DEBUG_CONTAINER" = true ]; then
         --name "$CONTAINER_NAME" \
         -e NVIDIA_VISIBLE_DEVICES="$GPU_ID" \
         ${ENV_FLAGS} \
-        -e http_proxy=http://proxy-chain.intel.com:911 \
-        -e https_proxy=http://proxy-chain.intel.com:912 \
-        -e no_proxy=intel.com,.intel.com,localhost,127.0.0.0/8 \
+        -e http_proxy="${http_proxy:?}" \
+        -e https_proxy="${https_proxy:?}" \
+        -e no_proxy="${no_proxy:?}" \
         ${MOUNT_FLAGS} \
         ${CACHE_MOUNT_FLAGS} \
         "$DOCKER_REG_ADDR"/ote/ci/cu"$VER_CUDA"/runner:"$TAG_RUNNER"; RET=$?
@@ -172,9 +166,9 @@ else
         --name "$CONTAINER_NAME" \
         -e NVIDIA_VISIBLE_DEVICES="$GPU_ID" \
         ${ENV_FLAGS} \
-        -e http_proxy=http://proxy-chain.intel.com:911 \
-        -e https_proxy=http://proxy-chain.intel.com:912 \
-        -e no_proxy=intel.com,.intel.com,localhost,127.0.0.0/8 \
+        -e http_proxy="${http_proxy:?}" \
+        -e https_proxy="${https_proxy:?}" \
+        -e no_proxy="${no_proxy:?}" \
         ${MOUNT_FLAGS} \
         ${CACHE_MOUNT_FLAGS} \
         "$DOCKER_REG_ADDR"/ote/ci/cu"$VER_CUDA"/runner:"$TAG_RUNNER"; RET=$?
